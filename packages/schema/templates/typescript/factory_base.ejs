@@ -1,0 +1,16 @@
+import { Factory } from "@blendsdk/datafactory";
+import { <%=interfaceName%> } from "../DbTypes";
+
+/**
+ * Generated base class for <%=tableName%> factory
+ *
+ * @export
+ * @abstract
+ * @class <%=className%>
+ * @extends {Factory}
+ */
+export abstract class <%=className%> extends Factory {
+<% methods.forEach(method => {%>
+<%-method -%>
+<%});%>
+}

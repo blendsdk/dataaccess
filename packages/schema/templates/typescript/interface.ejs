@@ -1,0 +1,11 @@
+/**
+ * Interface describing a <%=tableName%> record.
+ *
+ * @interface <%=name%>
+ * @export
+ */
+export interface <%=name%> {
+<% columns.forEach(column => { %>
+	<%=column.getName()%>?: <%=mapType(column.getType())%><%=";" -%>
+<%});%>
+}

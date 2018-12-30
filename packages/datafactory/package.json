@@ -1,0 +1,43 @@
+{
+    "name": "@blendsdk/datafactory",
+    "version": "0.0.1",
+    "description": "A generic data-access factory for PostgreSQL",
+    "author": "Gevik Babakhani <gevik@blendjs.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/blendsdk/blendsdk"
+    },
+    "scripts": {
+        "watch": "../../node_modules/.bin/watch 'npm run build' ./src",
+        "build": "npm run clean && npm run tslint && npm run build:lib",
+        "build:lib": "../../node_modules/.bin/tsc -p ./",
+        "clean": "../../node_modules/.bin/rimraf .build dist",
+        "tslint": "../../node_modules/.bin/tslint --config ../../tslint.json --project ./tsconfig.json"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "keywords": [
+        "typescript",
+        "framework",
+        "library",
+        "postgresql",
+        "orm",
+        "factory",
+        "components"
+    ],
+    "dependencies": {
+        "@types/dotenv": "^6.1.0",
+        "dotenv": "^6.2.0",
+        "pg": "^7.7.1",
+        "winston": "^3.1.0",
+        "yesql": "^3.2.2"
+    },
+    "devDependencies": {
+        "@types/ejs": "^2.6.1",
+        "@types/pg": "^7.4.11",
+        "tslint": "^5.12.0",
+        "typescript": "^3.2.2",
+        "@types/yesql": "^3.2.1"
+    }
+}

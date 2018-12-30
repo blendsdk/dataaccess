@@ -1,3 +1,3 @@
-#BlendSDK DataAccess
+# BlendSDK DataAccess
 
-Set of Node classes for generating PostgreSQL database schema and data factory classes.
+Set of Node classes for generating PostgreSQL database schema and data factory classes in TypeScript.

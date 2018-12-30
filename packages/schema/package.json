@@ -1,0 +1,54 @@
+{
+    "name": "@blendsdk/schema",
+    "version": "0.0.1",
+    "description": "Generates PostgreSQL database schema based on a programmable object model.",
+    "author": "Gevik Babakhani <gevik@blendjs.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/blendsdk/blendsdk"
+    },
+    "scripts": {
+        "watch": "../../node_modules/.bin/watch 'npm run build' ./src",
+        "build": "npm run clean && npm run tslint && npm run build:lib",
+        "build:lib": "../../node_modules/.bin/tsc -p ./",
+        "clean": "../../node_modules/.bin/rimraf .build dist",
+        "tslint": "../../node_modules/.bin/tslint --config ../../tslint.json --project ./tsconfig.json",
+        "jest-watch": "jest --watch"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "keywords": [
+        "PostgreSQL",
+        "postgres",
+        "dataaccess",
+        "orm",
+        "framework",
+        "sql",
+        "components"
+    ],
+    "dependencies": {
+        "@types/mkdirp": "^0.5.2",
+        "dotenv": "^6.2.0",
+        "ejs": "^2.6.1",
+        "mkdirp": "^0.5.1",
+        "pg": "^7.7.1",
+        "winston": "^3.1.0",
+        "yesql": "^3.2.2"
+    },
+    "devDependencies": {
+        "@types/dotenv": "^6.1.0",
+        "@types/jest": "^23.3.10",
+        "@types/morgan": "^1.7.35",
+        "@types/node": "^10.12.18",
+        "@types/pg": "^7.4.11",
+        "@types/winston": "^2.4.4",
+        "@types/yesql": "^3.2.1",
+        "jest": "^23.6.0",
+        "supertest": "^3.3.0",
+        "ts-jest": "^23.10.5",
+        "ts-node": "^7.0.1",
+        "tslint": "^5.12.0",
+        "typescript": "^3.2.2"
+    }
+}

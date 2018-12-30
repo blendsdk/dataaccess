@@ -1,0 +1,10 @@
+	/**
+	 * Inserts a record into the <%=tableName%> table.
+	 *
+	 * @returns {Promise<<%=interfaceName%>>}
+	 */
+	public insert(values: <%=interfaceName%>): Promise<<%=interfaceName%>> {
+		const me = this,
+			stmt = me.createInsertStatement("<%=tableName%>", values);
+		return me.executeQuerySingle(stmt.statement, stmt.params);
+	}

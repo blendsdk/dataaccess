@@ -1,0 +1,9 @@
+temp
+trunk
+node_modules
+.build
+dist
+*.tgz
+*.log
+TODO.md
+package-lock.json

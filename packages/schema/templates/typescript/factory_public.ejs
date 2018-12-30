@@ -1,0 +1,14 @@
+import { <%=className%>Base } from "./base/<%=className%>Base";
+
+/**
+ * Provides data-access for the <%=tableName%> table
+ *
+ * @abstract
+ * @class <%=className%>
+ * @extends {Factory}
+ */
+class <%=className%>Singleton extends <%=className%>Base {
+
+}
+
+export const <%=className%> = new <%=className%>Singleton();
