@@ -4,3 +4,5 @@ src
 *.config.js
 tsconfig.json
 TODO.md
+tests
+jest.*
