@@ -11,4 +11,20 @@ class <%=className%>Singleton extends <%=className%>Base {
 
 }
 
-export const <%=className%> = new <%=className%>Singleton();
+/**
+ * Internal instance of <%=className%>Singleton
+ */
+let instance: <%=className%>Singleton = null;
+
+/**
+ * Creates a single instance of the <%=className%>Singleton
+ *
+ * @export
+ * @returns {<%=className%>Singleton}
+ */
+export function <%=className%>(): <%=className%>Singleton {
+    if (instance === null) {
+        instance = new <%=className%>Singleton();
+    }
+    return instance;
+}

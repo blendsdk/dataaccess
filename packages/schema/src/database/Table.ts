@@ -29,10 +29,14 @@ export class Table extends Base {
         return result.length !== 0 ? result[0] : null;
     }
 
-    public getConstraints<T extends Constraint>(type: eDBConstraintType): T[] {
-        return (this.constraints.filter(item => {
-            return item.getType() === type;
-        }) || []) as T[];
+    public getConstraints<T extends Constraint>(type?: eDBConstraintType): T[] {
+        if (type) {
+            return (this.constraints.filter(item => {
+                return item.getType() === type;
+            }) || []) as T[];
+        } else {
+            return this.constraints as T[];
+        }
     }
 
     protected addColumn(column: Column): Column {

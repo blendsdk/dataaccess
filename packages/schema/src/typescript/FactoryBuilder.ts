@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import * as mkdirp from "mkdirp";
 import * as path from "path";
+import { Column } from "../database/Column";
 import { Table } from "../database/Table";
+import { eDBConstraintType } from "../database/Types";
 import * as utils from "../utils/Utils";
 import { mapColumnType } from "./Utils";
 
@@ -18,24 +20,58 @@ export class FactoryBuilder {
         return `I${utils.camelCase(table.getName())}`;
     }
 
-    protected generateInsert(table: Table): string {
+    protected generateInsert(table: Table, methods: string[]) {
         const me = this;
-        return utils.renderTemplate("typescript/factory_insert.ejs", {
-            interfaceName: me.getInterfaceName(table),
-            tableName: table.getName()
+        methods.push(
+            utils.renderTemplate("typescript/factory_insert.ejs", {
+                interfaceName: me.getInterfaceName(table),
+                tableName: table.getName()
+            })
+        );
+    }
+
+    protected camelCaseColumnNames(names: string[]): string[] {
+        return names.map(name => {
+            if (name.toLowerCase() === "id") {
+                return "ID";
+            } else {
+                return utils.camelCase(name);
+            }
         });
     }
 
-    // protected generateFactory(table: Table) {
-    //     return utils.renderTemplate("typescript/factory.ejs", {
-    //         factoryName: `${utils.camelCase(table.getName())}Factory`,
-    //         recordName: `I${utils.camelCase(table.getName())}`,
-    //         tableName: table.getName(),
-    //         columns: table.getColumns(),
-    //         mapType: mapColumnType,
-    //         ...this.options
-    //     });
-    // }
+    protected columnToMethodParameters(columns: Column[]): string[] {
+        return columns.map(column => {
+            return `${column.getName()}: ${mapColumnType(column.getType())}`;
+        });
+    }
+
+    protected generateConstraintMethodsBy(table: Table, methods: string[]) {
+        const me = this,
+            constraints = table.getConstraints().filter(item => {
+                switch (item.getType()) {
+                    case eDBConstraintType.primaryKey:
+                    case eDBConstraintType.unique:
+                        return true;
+                    default:
+                        return false;
+                }
+            });
+        if (constraints.length !== 0) {
+            constraints.forEach(constraint => {
+                methods.push(
+                    utils.renderTemplate("typescript/factory_constraint_methods.ejs", {
+                        methodName: me.camelCaseColumnNames(constraint.getColumnNames()).join("And"),
+                        parameters: me.columnToMethodParameters(constraint.getColumns()),
+                        parameterValues: constraint.getColumnNames(),
+                        interfaceName: me.getInterfaceName(table),
+                        tableName: table.getName(),
+                        columns: me.camelCaseColumnNames(constraint.getColumnNames())
+                    })
+                );
+            });
+        }
+    }
 
     protected generatePublicClass(table: Table) {
         const me = this,
@@ -50,12 +86,15 @@ export class FactoryBuilder {
     }
 
     protected generateBaseClass(table: Table) {
-        const methods: string[] = [];
-        if (table.hasPrimaryKey()) {
-            methods.push(this.generateInsert(table));
-        }
         const me = this,
-            className = `${utils.camelCase(table.getName())}FactoryBase`,
+            methods: string[] = [];
+        if (table.hasPrimaryKey()) {
+            me.generateInsert(table, methods);
+        }
+
+        me.generateConstraintMethodsBy(table, methods);
+
+        const className = `${utils.camelCase(table.getName())}FactoryBase`,
             clazz = utils.renderTemplate("typescript/factory_base.ejs", {
                 className,
                 tableName: table.getName(),

@@ -13,6 +13,10 @@ export class Constraint extends Base {
         this.options = options || {};
     }
 
+    public getColumns(): Column[] {
+        return this.columns;
+    }
+
     public getColumnNames(): string[] {
         return this.columns.map(column => {
             return column.getName();
