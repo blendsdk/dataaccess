@@ -20,9 +20,9 @@ export interface ISqlStatement {
  *
  * @export
  * @abstract
- * @class Factory
+ * @class DataFactory
  */
-export abstract class Factory {
+export abstract class DataFactory {
     /**
      * Execute a SQL query and return a QueryResult object
      *
@@ -30,7 +30,7 @@ export abstract class Factory {
      * @param {string} stmt
      * @param {*} [params]
      * @returns {Promise<QueryResult>}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected query(stmt: string, params?: any): Promise<QueryResult> {
         const yq = yesql(stmt)(params);
@@ -45,7 +45,7 @@ export abstract class Factory {
      * @param {string} stmt
      * @param {*} [params]
      * @returns {Promise<number>}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected executeNonQuery(stmt: string, params?: any): Promise<number> {
         const me = this;
@@ -67,7 +67,7 @@ export abstract class Factory {
      * @param {string} stmt
      * @param {*} [params]
      * @returns {Promise<T[]>}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     public executeQuery<T>(stmt: string, params?: any): Promise<T[]> {
         const me = this;
@@ -89,7 +89,7 @@ export abstract class Factory {
      * @param {string} stmt
      * @param {*} [params]
      * @returns {Promise<T>}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected executeQuerySingle<T>(stmt: string, params?: any): Promise<T> {
         const me = this;
@@ -109,7 +109,7 @@ export abstract class Factory {
      * @protected
      * @param {*} values
      * @returns {string[]}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected removeUndefined(values: any): string[] {
         values = values || {};
@@ -125,7 +125,7 @@ export abstract class Factory {
      * @param {string} tableName
      * @param {*} values
      * @returns {ISqlStatement}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected createInsertStatement(tableName: string, values: any): ISqlStatement {
         const me = this,
@@ -147,7 +147,7 @@ export abstract class Factory {
      * @param {*} setValues
      * @param {*} clauseValues
      * @returns {ISqlStatement}
-     * @memberof Factory
+     * @memberof DataFactory
      */
     protected createUpdateStatement(tableName: string, setValues: any, clauseValues: any): ISqlStatement {
         const me = this,
@@ -167,6 +167,60 @@ export abstract class Factory {
 
         return {
             statement: `UPDATE ${tableName} SET ${setParams.join(",")} WHERE ${clauseParams.join(" AND ")} RETURNING *`,
+            params: allParams
+        };
+    }
+
+    /**
+     * Creates a DELETE statement
+     *
+     * @protected
+     * @param {string} tableName
+     * @param {*} clauseValues
+     * @returns {ISqlStatement}
+     * @memberof DataFactory
+     */
+    protected createDeleteStatement(tableName: string, clauseValues: any): ISqlStatement {
+        const me = this,
+            allParams: any = {},
+            clauseParams = me.removeUndefined(clauseValues).map(name => {
+                if (clauseValues[name] !== null) {
+                    allParams[`_${name}`] = clauseValues[name];
+                    return `${name}=:_${name}`;
+                } else {
+                    return `${name} IS NULL`;
+                }
+            });
+
+        return {
+            statement: `DELETE FROM ${tableName} WHERE ${clauseParams.join(" AND ")} RETURNING *`,
+            params: allParams
+        };
+    }
+
+    /**
+     * Creates a SELECT statement
+     *
+     * @protected
+     * @param {string} tableName
+     * @param {*} clauseValues
+     * @returns {ISqlStatement}
+     * @memberof DataFactory
+     */
+    protected createSelectStatement(tableName: string, clauseValues: any): ISqlStatement {
+        const me = this,
+            allParams: any = {},
+            clauseParams = me.removeUndefined(clauseValues).map(name => {
+                if (clauseValues[name] !== null) {
+                    allParams[`_${name}`] = clauseValues[name];
+                    return `${name}=:_${name}`;
+                } else {
+                    return `${name} IS NULL`;
+                }
+            });
+
+        return {
+            statement: `SELECT * FROM ${tableName} WHERE ${clauseParams.join(" AND ")}`,
             params: allParams
         };
     }
