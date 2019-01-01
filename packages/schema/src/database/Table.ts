@@ -29,6 +29,17 @@ export class Table extends Base {
         return result.length !== 0 ? result[0] : null;
     }
 
+    public hasForeignKeys(): boolean {
+        return this.getForeignKeys().length !== 0;
+    }
+
+    public getForeignKeys(): ForeignKeyConstraint[] {
+        const result: ForeignKeyConstraint[] = this.constraints.filter(item => {
+            return item.getType() === eDBConstraintType.foreignKey;
+        }) as ForeignKeyConstraint[];
+        return result || [];
+    }
+
     public getConstraints<T extends Constraint>(type?: eDBConstraintType): T[] {
         if (type) {
             return (this.constraints.filter(item => {

@@ -1,4 +1,5 @@
 import { Base } from "./Base";
+import { DependencySorter } from "./DependencySorter";
 import { Table } from "./Table";
 
 /**
@@ -19,7 +20,13 @@ export abstract class Database extends Base {
      */
     protected tables: Table[];
 
-    public abstract create(): any;
+    protected abstract createInternal(): any;
+
+    public create() {
+        const sorter = new DependencySorter(this.tables);
+        this.tables = sorter.sort();
+        this.createInternal();
+    }
 
     /**
      * Creates an instance of Database.

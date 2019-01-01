@@ -109,7 +109,7 @@ export class PostgreSQLDatabase extends Database {
         });
     }
 
-    public create() {
+    protected createInternal() {
         this.tables.forEach(table => {
             this.dropTable(table);
         });
