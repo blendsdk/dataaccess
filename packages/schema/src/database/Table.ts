@@ -2,7 +2,7 @@ import { Base } from "./Base";
 import { Column } from "./Column";
 import { Constraint } from "./Constraint";
 import { ForeignKeyConstraint } from "./ForeignKeyConstraint";
-import { eDBColumnType, eDBConstraintType, eDBForeignKeyAction, IColumnOptions, IForeignKeyAction } from "./Types";
+import { eDBColumnType, eDBConstraintType, IColumnOptions, IForeignKeyAction } from "./Types";
 
 /**
  * This class represents a database Table
