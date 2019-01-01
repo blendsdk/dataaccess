@@ -1,6 +1,6 @@
 {
     "name": "@blendsdk/schema",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "Generates PostgreSQL database schema based on a programmable object model.",
     "author": "Gevik Babakhani <gevik@blendjs.com>",
     "license": "MIT",
@@ -14,8 +14,8 @@
         "build:lib": "../../node_modules/.bin/tsc -p ./",
         "clean": "../../node_modules/.bin/rimraf .build dist",
         "tslint": "../../node_modules/.bin/tslint --config ../../tslint.json --project ./tsconfig.json",
-		"jest-watch": "jest --watch",
-		"debug":"node ./dist/test.js"
+        "jest-watch": "jest --watch",
+        "debug": "node ./dist/test.js"
     },
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
