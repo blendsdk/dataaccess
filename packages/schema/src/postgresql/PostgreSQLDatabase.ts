@@ -5,6 +5,9 @@ import { Table } from "../database/Table";
 import { eDBColumnType, eDBConstraintType, eDBForeignKeyAction } from "../database/Types";
 import { log } from "../utils/Utils";
 
+/**
+ * The global PG Pool object.
+ */
 const pool = new Pool();
 
 /**
@@ -19,14 +22,38 @@ function executeQuery(stmt: string, params?: any[]): Promise<QueryResult> {
     return pool.query(stmt, params || []);
 }
 
+/**
+ * This class is generated a PostgreSQL database based on the Database/Table
+ * description.
+ *
+ * @export
+ * @class PostgreSQLDatabase
+ * @extends {Database}
+ */
 export class PostgreSQLDatabase extends Database {
+    /**
+     * Internal sql scripts lines.
+     */
     protected script: string[];
 
+    /**
+     * Creates an instance of PostgreSQLDatabase.
+     * @param {string} name
+     * @memberof PostgreSQLDatabase
+     */
     public constructor(name: string) {
         super(name);
         this.script = [];
     }
 
+    /**
+     * Maps the column types to PostgreSQL types.
+     *
+     * @protected
+     * @param {eDBColumnType} type
+     * @returns {string}
+     * @memberof PostgreSQLDatabase
+     */
     protected mapColumnType(type: eDBColumnType): string {
         switch (type) {
             case eDBColumnType.string:
@@ -48,6 +75,14 @@ export class PostgreSQLDatabase extends Database {
         }
     }
 
+    /**
+     * Map the foreign key reference actions.
+     *
+     * @protected
+     * @param {eDBForeignKeyAction} type
+     * @returns
+     * @memberof PostgreSQLDatabase
+     */
     protected mapRefAction(type: eDBForeignKeyAction) {
         switch (type) {
             case eDBForeignKeyAction.cascade:
@@ -59,14 +94,34 @@ export class PostgreSQLDatabase extends Database {
         }
     }
 
+    /**
+     * Drop cascade the table.
+     *
+     * @protected
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     protected dropTable(table: Table) {
         this.script.push(`DROP TABLE IF EXISTS ${table.getName()} CASCADE`);
     }
 
+    /**
+     * Create the table.
+     *
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     public createTable(table: Table) {
         this.script.push(`CREATE TABLE ${table.getName()}()`);
     }
 
+    /**
+     * Create the table columns.
+     *
+     * @protected
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     protected createColumns(table: Table) {
         const me = this;
         table.getColumns().forEach(column => {
@@ -80,6 +135,13 @@ export class PostgreSQLDatabase extends Database {
         });
     }
 
+    /**
+     * Create the primary key.
+     *
+     * @protected
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     protected createPrimaryKey(table: Table) {
         const pkey = table.getPrimaryKey();
         if (pkey) {
@@ -87,6 +149,13 @@ export class PostgreSQLDatabase extends Database {
         }
     }
 
+    /**
+     * Create the unique contarints
+     *
+     * @protected
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     protected createUniqueConstraints(table: Table) {
         const me = this;
         table.getConstraints(eDBConstraintType.unique).forEach(item => {
@@ -94,6 +163,13 @@ export class PostgreSQLDatabase extends Database {
         });
     }
 
+    /**
+     * Create the foreign keys constraints.
+     *
+     * @protected
+     * @param {Table} table
+     * @memberof PostgreSQLDatabase
+     */
     protected createForeignKeyConstraints(table: Table) {
         const me = this;
         table.getConstraints<ForeignKeyConstraint>(eDBConstraintType.foreignKey).forEach(item => {
@@ -109,7 +185,12 @@ export class PostgreSQLDatabase extends Database {
         });
     }
 
-    protected createInternal() {
+    /**
+     * @override
+     * @protected
+     * @memberof PostgreSQLDatabase
+     */
+    protected create() {
         this.tables.forEach(table => {
             this.dropTable(table);
         });
