@@ -187,10 +187,9 @@ export class PostgreSQLDatabase extends Database {
 
     /**
      * @override
-     * @protected
      * @memberof PostgreSQLDatabase
      */
-    protected create() {
+    public create() {
         this.tables.forEach(table => {
             this.dropTable(table);
         });
