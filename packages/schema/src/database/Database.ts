@@ -22,6 +22,7 @@ export abstract class Database extends Base {
     /**
      * Abstract method for implementing the database creation scripts.
      *
+     * @protected
      * @abstract
      * @returns {*}
      * @memberof Database

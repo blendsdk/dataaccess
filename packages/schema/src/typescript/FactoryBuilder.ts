@@ -50,7 +50,7 @@ export class FactoryBuilder {
      */
     public constructor(table: Table | Table[]) {
         this.tables = utils.wrapInArray(table);
-        this.factoryClasses = [];
+        this.factoryClasses = ["DbTypes"];
     }
 
     /**
