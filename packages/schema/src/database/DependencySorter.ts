@@ -1,5 +1,11 @@
 import { Table } from "./Table";
 
+/**
+ * A simple dependency sorter to prioritize table creation.
+ *
+ * @export
+ * @class DependencySorter
+ */
 export class DependencySorter {
     protected tables: Table[];
 
@@ -41,6 +47,16 @@ export class DependencySorter {
         return unsorted;
     }
 
+    /**
+     * Find the index of a table in the tables array given
+     * its name.
+     *
+     * @protected
+     * @param {string} name
+     * @param {Table[]} tables
+     * @returns
+     * @memberof DependencySorter
+     */
     protected findIndexOf(name: string, tables: Table[]) {
         let result: number = -1;
         tables.forEach((table: Table, index: number) => {
