@@ -180,7 +180,7 @@ export class FactoryBuilder {
         utils.log("Generating the factory index");
         fs.writeFileSync(
             path.join(this.outFolder, "index.ts"),
-            this.factoryClasses.map(item => `export * from "./${item};`).join("\n")
+            this.factoryClasses.map(item => `export * from "./${item}";`).join("\n")
         );
     }
 
