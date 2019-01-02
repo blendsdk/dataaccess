@@ -23,6 +23,7 @@ export class FactoryBuilder {
      * @memberof FactoryBuilder
      */
     protected tables: Table[];
+    protected factoryClasses: string[];
 
     /**
      * The base folder to generate the files
@@ -49,6 +50,7 @@ export class FactoryBuilder {
      */
     public constructor(table: Table | Table[]) {
         this.tables = utils.wrapInArray(table);
+        this.factoryClasses = [];
     }
 
     /**
@@ -161,6 +163,8 @@ export class FactoryBuilder {
             className = `${utils.camelCase(table.getName())}Factory`,
             fileName = path.join(this.outFolder, `${className}.ts`);
 
+        this.factoryClasses.push(className);
+
         if (!fs.existsSync(fileName)) {
             const clazz = utils.renderTemplate("typescript/factory_public.ejs", {
                 className,
@@ -172,6 +176,12 @@ export class FactoryBuilder {
         } else {
             utils.log(`\tSkipping ${className}`);
         }
+
+        utils.log("Generating the factory index");
+        fs.writeFileSync(
+            path.join(this.outFolder, "index.ts"),
+            this.factoryClasses.map(item => `export * from "./${item};`).join("\n")
+        );
     }
 
     /**
