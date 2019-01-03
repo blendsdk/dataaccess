@@ -1,3 +1,4 @@
+
 	<% if(singleOpr) { %>/**
 	 * Updates a record of the <%=tableName%> table.
 	 *
@@ -30,7 +31,8 @@
 			stmt = me.createSelectStatement("<%=tableName%>", { <%=parameterValues%> });
 		return me.executeQuerySingle(stmt.statement, stmt.params);
 	}
-	<% } else { %>/**
+	<% } else { %>
+	/**
 	 * Deletes a records of the <%=tableName%> table.
 	 *
 	 * @returns {Promise<<%=returnType%>>}

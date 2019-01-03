@@ -1,5 +1,5 @@
 import { DataFactory } from "@blendsdk/datafactory";
-import { <%=interfaceName%> } from "../DbTypes";
+import { <%=interfaceNames-%> } from "../DbTypes";
 
 /**
  * Generated base class for <%=tableName%> factory
@@ -10,15 +10,5 @@ import { <%=interfaceName%> } from "../DbTypes";
  * @extends {Factory}
  */
 export abstract class <%=className%> extends DataFactory {
-	/**
-	 * Select all record of the <%=tableName%> table.
-	 *
-	 * @returns {Promise<<%=interfaceName%>>}
-	 */
-	public getAll(): Promise<<%=interfaceName%>[]> {
-		return this.executeQuery("SELECT * FROM <%=tableName%>");
-	}
-<% methods.forEach(method => {%>
-<%-method -%>
-<%});%>
+<% methods.forEach(method => {%> <%-method -%> <%});%>
 }

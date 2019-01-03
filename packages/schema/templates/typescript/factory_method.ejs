@@ -1,0 +1,12 @@
+
+
+	/**<% jsDocs.forEach(line => {%>
+	 * <%-line -%>
+<%});%>
+	 */
+	public <%=methodName%>(<%=methodParameters%>): Promise<<%=returnType%>> {
+		return this.<%=queryMethod%>(
+			`<%=query%>`,
+			{ <%=queryParameters%> }
+		);
+	}

@@ -8,6 +8,46 @@ import * as utils from "../utils/Utils";
 import { mapColumnType } from "./Utils";
 
 /**
+ * Enum to configure a query method.
+ *
+ * @export
+ * @enum {string}
+ */
+export enum eQueryMethod {
+    executeNonQuery = "executeNonQuery",
+    executeQuery = "executeQuery",
+    executeQuerySingle = "executeQuerySingle"
+}
+
+/**
+ * Interface for describing a parameter for IMethod interface
+ *
+ * @export
+ * @interface IMethodParameter
+ */
+export interface IMethodParameter {
+    name: string;
+    type: string;
+}
+
+/**
+ * Interface for describing a method for the FactoryBuilder addMethod.
+ *
+ * @export
+ * @interface IMethod
+ */
+export interface IMethod {
+    forTable: Table;
+    description?: string;
+    methodName: string;
+    returnType?: string;
+    returnTypeIsArray?: boolean;
+    parameters?: IMethodParameter | IMethodParameter[];
+    queryMethod: eQueryMethod;
+    query: string;
+}
+
+/**
  * This class generates data factory classes
  * based on the provided tables.
  *
@@ -23,7 +63,30 @@ export class FactoryBuilder {
      * @memberof FactoryBuilder
      */
     protected tables: Table[];
+    /**
+     * List of factory classes
+     *
+     * @protected
+     * @type {string[]}
+     * @memberof FactoryBuilder
+     */
     protected factoryClasses: string[];
+    /**
+     * List of methods to be added to a factory class.
+     *
+     * @protected
+     * @type {IMethod[]}
+     * @memberof FactoryBuilder
+     */
+    protected factoryMethods: IMethod[];
+    /**
+     * List of db type interfaces to be imported to the factory base class.
+     *
+     * @protected
+     * @type {string[]}
+     * @memberof FactoryBuilder
+     */
+    protected importedDbTypes: string[];
 
     /**
      * The base folder to generate the files
@@ -51,6 +114,21 @@ export class FactoryBuilder {
     public constructor(table: Table | Table[]) {
         this.tables = utils.wrapInArray(table);
         this.factoryClasses = ["DbTypes"];
+        this.factoryMethods = [];
+        this.importedDbTypes = [];
+    }
+
+    /**
+     * Adds a method description to be generated for a given table
+     *
+     * @param {(IMethod | IMethod[])} method
+     * @memberof FactoryBuilder
+     */
+    public addMethod(method: IMethod | IMethod[]) {
+        const me = this;
+        utils.wrapInArray<IMethod>(method).forEach(item => {
+            me.factoryMethods.push(item);
+        });
     }
 
     /**
@@ -179,6 +257,60 @@ export class FactoryBuilder {
     }
 
     /**
+     * Generate factory methods.
+     *
+     * @protected
+     * @param {Table} table
+     * @param {string[]} methods
+     * @memberof FactoryBuilder
+     */
+    protected generateFactoryMethods(table: Table, methods: string[]) {
+        const me = this,
+            methodDefs = me.factoryMethods.filter(def => {
+                return def.forTable.getName() === table.getName();
+            });
+
+        methodDefs.forEach(methodDef => {
+            const returnType = (methodDef.returnType || me.getInterfaceName(table)).trim();
+            if (me.importedDbTypes.indexOf(returnType) === -1) {
+                me.importedDbTypes.push(returnType);
+                console.log(me.importedDbTypes.join(" | "));
+            }
+            methods.push(
+                utils.renderTemplate("typescript/factory_method.ejs", {
+                    returnType: `${returnType}${methodDef.returnTypeIsArray ? "[]" : ""}`.trim(),
+                    methodName: methodDef.methodName,
+                    methodParameters: utils
+                        .wrapInArray<IMethodParameter>(methodDef.parameters)
+                        .map(param => {
+                            return `${param.name}: ${param.type}`;
+                        })
+                        .join(", "),
+                    queryMethod: methodDef.queryMethod,
+                    query: methodDef.query,
+                    queryParameters: utils
+                        .wrapInArray<IMethodParameter>(methodDef.parameters)
+                        .map(param => {
+                            return `${param.name}`;
+                        })
+                        .join(", "),
+                    jsDocs: [methodDef.description || `The ${methodDef.methodName} method.`].concat(
+                        utils
+                            .wrapInArray<IMethodParameter>(methodDef.parameters)
+                            .map(param => {
+                                return `@param {${param.type}} ${param.name}`;
+                            })
+                            .concat([
+                                `@returns {Promise<${returnType}>}`,
+                                `@memberof ${utils.camelCase(table.getName())}FactoryBase`
+                            ])
+                    )
+                })
+            );
+        });
+    }
+
+    /**
      * Generates the base part of the factory class.
      *
      * @protected
@@ -189,14 +321,28 @@ export class FactoryBuilder {
         const me = this,
             methods: string[] = [];
 
+        me.importedDbTypes = [me.getInterfaceName(table)];
+
+        me.addMethod({
+            forTable: table,
+            description: `Gets all records of ${table.getName()}`,
+            query: `SELECT * FROM ${table.getName()}`,
+            queryMethod: eQueryMethod.executeQuery,
+            methodName: "getAll",
+            returnTypeIsArray: true
+        });
+
         me.generateInsert(table, methods);
         me.generateConstraintMethodsBy(table, methods);
+        me.generateFactoryMethods(table, methods);
+
+        me.importedDbTypes.sort();
 
         const className = `${utils.camelCase(table.getName())}FactoryBase`,
             clazz = utils.renderTemplate("typescript/factory_base.ejs", {
                 className,
                 tableName: table.getName(),
-                interfaceName: me.getInterfaceName(table),
+                interfaceNames: me.importedDbTypes.join(", "),
                 methods
             });
         utils.log(`Generating ${className}`);
