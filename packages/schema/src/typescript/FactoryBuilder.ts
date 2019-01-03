@@ -125,30 +125,24 @@ export class FactoryBuilder {
      * @memberof FactoryBuilder
      */
     protected generateConstraintMethodsBy(table: Table, methods: string[]) {
-        const me = this,
-            constraints = table.getConstraints().filter(item => {
-                switch (item.getType()) {
-                    case eDBConstraintType.primaryKey:
-                    case eDBConstraintType.unique:
-                        return true;
-                    default:
-                        return false;
-                }
-            });
-        if (constraints.length !== 0) {
-            constraints.forEach(constraint => {
-                methods.push(
-                    utils.renderTemplate("typescript/factory_constraint_methods.ejs", {
-                        methodName: me.camelCaseColumnNames(constraint.getColumnNames()).join("And"),
-                        parameters: me.columnToMethodParameters(constraint.getColumns()),
-                        parameterValues: constraint.getColumnNames(),
-                        interfaceName: me.getInterfaceName(table),
-                        tableName: table.getName(),
-                        columns: me.camelCaseColumnNames(constraint.getColumnNames())
-                    })
-                );
-            });
-        }
+        const me = this;
+        table.getConstraints().forEach(constraint => {
+            const singleOperation =
+                constraint.getType() === eDBConstraintType.primaryKey ||
+                constraint.getType() === eDBConstraintType.unique;
+            methods.push(
+                utils.renderTemplate("typescript/factory_constraint_methods.ejs", {
+                    methodName: me.camelCaseColumnNames(constraint.getColumnNames()).join("And"),
+                    parameters: me.columnToMethodParameters(constraint.getColumns()),
+                    parameterValues: constraint.getColumnNames(),
+                    interfaceName: me.getInterfaceName(table),
+                    tableName: table.getName(),
+                    columns: me.camelCaseColumnNames(constraint.getColumnNames()),
+                    returnType: `${me.getInterfaceName(table)}${singleOperation ? "" : "[]"}`,
+                    singleOpr: singleOperation
+                })
+            );
+        });
     }
 
     /**
@@ -194,10 +188,8 @@ export class FactoryBuilder {
     protected generateBaseClass(table: Table) {
         const me = this,
             methods: string[] = [];
-        if (table.hasPrimaryKey()) {
-            me.generateInsert(table, methods);
-        }
 
+        me.generateInsert(table, methods);
         me.generateConstraintMethodsBy(table, methods);
 
         const className = `${utils.camelCase(table.getName())}FactoryBase`,

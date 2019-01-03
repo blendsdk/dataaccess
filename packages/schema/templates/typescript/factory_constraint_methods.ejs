@@ -1,32 +1,54 @@
-	/**
+	<% if(singleOpr) { %>/**
 	 * Updates a record of the <%=tableName%> table.
 	 *
-	 * @returns {Promise<<%=interfaceName%>>}
+	 * @returns {Promise<<%=returnType%>>}
 	 */
-	public updateBy<%=methodName%>(values: <%=interfaceName%>, <%=parameters%>): Promise<<%=interfaceName%>> {
+	public updateBy<%=methodName%>(values: <%=interfaceName%>, <%=parameters%>): Promise<<%=returnType%>> {
 		const me = this,
 			stmt = me.createUpdateStatement("<%=tableName%>", values, { <%=parameterValues%> });
 		return me.executeQuerySingle(stmt.statement, stmt.params);
 	}
 
 	/**
-	 * Updates a record of the <%=tableName%> table.
+	 * Deletes a record of the <%=tableName%> table.
 	 *
-	 * @returns {Promise<<%=interfaceName%>>}
+	 * @returns {Promise<<%=returnType%>>}
 	 */
-	public deleteBy<%=methodName%>(<%=parameters%>): Promise<<%=interfaceName%>> {
+	public deleteBy<%=methodName%>(<%=parameters%>): Promise<<%=returnType%>> {
 		const me = this,
 			stmt = me.createDeleteStatement("<%=tableName%>", { <%=parameterValues%> });
 		return me.executeQuerySingle(stmt.statement, stmt.params);
 	}
 
 	/**
-	 * Updates a record of the <%=tableName%> table.
+	 * get a record of the <%=tableName%> table.
 	 *
-	 * @returns {Promise<<%=interfaceName%>>}
+	 * @returns {Promise<<%=returnType%>>}
 	 */
-	public getBy<%=methodName%>(<%=parameters%>): Promise<<%=interfaceName%>> {
+	public getBy<%=methodName%>(<%=parameters%>): Promise<<%=returnType%>> {
 		const me = this,
 			stmt = me.createSelectStatement("<%=tableName%>", { <%=parameterValues%> });
 		return me.executeQuerySingle(stmt.statement, stmt.params);
 	}
+	<% } else { %>/**
+	 * Deletes a records of the <%=tableName%> table.
+	 *
+	 * @returns {Promise<<%=returnType%>>}
+	 */
+	public deleteManyBy<%=methodName%>(<%=parameters%>): Promise<number> {
+		const me = this,
+			stmt = me.createDeleteStatement("<%=tableName%>", { <%=parameterValues%> });
+		return me.executeNonQuery(stmt.statement, stmt.params);
+	}
+
+	/**
+	 * get records of the <%=tableName%> table.
+	 *
+	 * @returns {Promise<<%=returnType%>>}
+	 */
+	public getManyBy<%=methodName%>(<%=parameters%>): Promise<<%=returnType%>> {
+		const me = this,
+			stmt = me.createSelectStatement("<%=tableName%>", { <%=parameterValues%> });
+		return me.executeQuery(stmt.statement, stmt.params);
+	}
+	<% } %>
