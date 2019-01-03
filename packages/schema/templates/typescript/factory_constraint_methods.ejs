@@ -25,7 +25,7 @@
 	 *
 	 * @returns {Promise<<%=interfaceName%>>}
 	 */
-	public selectBy<%=methodName%>(<%=parameters%>): Promise<<%=interfaceName%>> {
+	public getBy<%=methodName%>(<%=parameters%>): Promise<<%=interfaceName%>> {
 		const me = this,
 			stmt = me.createSelectStatement("<%=tableName%>", { <%=parameterValues%> });
 		return me.executeQuerySingle(stmt.statement, stmt.params);
