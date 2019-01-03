@@ -12,7 +12,7 @@ export class Column extends Base {
     protected type: eDBColumnType;
     protected options: IColumnOptions;
 
-    public iNullable(): boolean {
+    public isNullable(): boolean {
         return this.options.nullable || false;
     }
 
