@@ -1,6 +1,7 @@
 import { Pool, QueryResult } from "pg";
 import { pg as yesql } from "yesql";
 import { logger } from "./logger";
+import { SQLClause } from "./SQLClause";
 
 const pool = new Pool();
 
@@ -24,6 +25,24 @@ export interface ISqlStatement {
  */
 export abstract class DataFactory {
     /**
+     * Close all connections and end the pool.
+     *
+     * @protected
+     * @returns {Promise<void>}
+     * @memberof DataFactory
+     */
+    protected endConnectionPool(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                pool.end();
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    /**
      * Execute a SQL query and return a QueryResult object
      *
      * @protected
@@ -33,9 +52,15 @@ export abstract class DataFactory {
      * @memberof DataFactory
      */
     protected query(stmt: string, params?: any): Promise<QueryResult> {
-        const yq = yesql(stmt)(params);
-        logger.debug(yq);
-        return pool.query(yq.text, yq.values || []);
+        return new Promise(async (resolve, reject) => {
+            try {
+                const yq = yesql(stmt)(params);
+                logger.debug(stmt);
+                resolve(await pool.query(yq.text, yq.values || []));
+            } catch (err) {
+                reject(err);
+            }
+        });
     }
 
     /**
@@ -69,7 +94,7 @@ export abstract class DataFactory {
      * @returns {Promise<T[]>}
      * @memberof DataFactory
      */
-    public executeQuery<T>(stmt: string, params?: any): Promise<T[]> {
+    protected executeQuery<T>(stmt: string, params?: any): Promise<T[]> {
         const me = this;
         return new Promise(async (resolve, reject) => {
             try {
@@ -211,9 +236,15 @@ export abstract class DataFactory {
         const me = this,
             allParams: any = {},
             clauseParams = me.removeUndefined(clauseValues).map(name => {
-                if (clauseValues[name] !== null) {
-                    allParams[`_${name}`] = clauseValues[name];
-                    return `${name}=:_${name}`;
+                const value = clauseValues[name];
+                if (value !== null) {
+                    if (value instanceof SQLClause) {
+                        allParams[`_${name}`] = value.getValue();
+                        return `${name}${value.getOperator()}:_${name}`;
+                    } else {
+                        allParams[`_${name}`] = value;
+                        return `${name}=:_${name}`;
+                    }
                 } else {
                     return `${name} IS NULL`;
                 }
