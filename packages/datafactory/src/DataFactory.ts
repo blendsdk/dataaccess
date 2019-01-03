@@ -55,7 +55,7 @@ export abstract class DataFactory {
         return new Promise(async (resolve, reject) => {
             try {
                 const yq = yesql(stmt)(params);
-                logger.debug(stmt);
+                logger.debug(yq);
                 resolve(await pool.query(yq.text, yq.values || []));
             } catch (err) {
                 reject(err);
