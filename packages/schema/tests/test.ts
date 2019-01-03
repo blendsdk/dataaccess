@@ -1,4 +1,3 @@
-import { DependencySorter } from "../src/database/DependencySorter";
 import { PostgreSQLDatabase } from "../src/postgresql/PostgreSQLDatabase";
 
 const db = new PostgreSQLDatabase("test"),
