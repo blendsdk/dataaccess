@@ -150,7 +150,7 @@ export class PostgreSQLDatabase extends Database {
     }
 
     /**
-     * Create the unique contarints
+     * Create the unique constraints.
      *
      * @protected
      * @param {Table} table
