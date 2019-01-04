@@ -1,5 +1,12 @@
 import { eDBColumnType } from "../database/Types";
 
+/**
+ * Maps generic types to typescript types.
+ *
+ * @export
+ * @param {eDBColumnType} type
+ * @returns {string}
+ */
 export function mapColumnType(type: eDBColumnType): string {
     switch (type) {
         case eDBColumnType.string:

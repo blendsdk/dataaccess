@@ -128,7 +128,7 @@ export class PostgreSQLDatabase extends Database {
             me.script.push(
                 `ALTER TABLE ${table.getName()} ADD COLUMN ${column.getName()} ${this.mapColumnType(
                     column.getType()
-                )} ${column.isNullable() ? "" : "NOT NULL"} ${
+                )} ${column.isRequired() ? "NOT NULL" : ""} ${
                     column.getDefault() ? `DEFAULT ${column.getDefault()}` : ""
                 } ${column.getCheck() ? `CHECK (${column.getCheck()})` : ""}`.trim()
             );

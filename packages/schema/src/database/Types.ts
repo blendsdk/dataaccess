@@ -45,7 +45,7 @@ export enum eDBConstraintType {
  */
 export interface IColumnOptions {
     unique?: boolean;
-    nullable?: boolean;
+    required?: boolean;
     default?: string;
     check?: string;
 }
