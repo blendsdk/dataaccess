@@ -34,17 +34,17 @@ export class Column extends Base {
      * @memberof Column
      */
     public isRequired(): boolean {
-        return this.options.required || true;
+        return this.options.required;
     }
 
     /**
-     * Get if this column is unqiue.
+     * Get if this column is unique.
      *
      * @returns {boolean}
      * @memberof Column
      */
     public isUnique(): boolean {
-        return this.options.unique || false;
+        return this.options.unique;
     }
 
     /**
@@ -91,8 +91,8 @@ export class Column extends Base {
         this.options = {
             check: options.check || undefined,
             default: options.default || undefined,
-            required: options.required || false,
-            unique: options.unique || false
+            required: options.required === undefined ? true : options.required,
+            unique: options.unique === undefined ? false : options.unique
         };
     }
 }
