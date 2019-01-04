@@ -1,6 +1,6 @@
 {
     "name": "@blendsdk/datafactory",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "description": "A generic data-access factory for PostgreSQL",
     "author": "Gevik Babakhani <gevik@blendjs.com>",
     "license": "MIT",
