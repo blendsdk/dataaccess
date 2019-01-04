@@ -8,3 +8,4 @@ This Package contains:
 -   `isNullOrUndef()`
 -   `wrapInArray()`
 -   `asyncForEach()`
+-   `withValidation()`
