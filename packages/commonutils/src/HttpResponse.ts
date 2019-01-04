@@ -80,7 +80,7 @@ export class HttpResponse {
 }
 
 /**
- * Handels a request with express validation
+ * Handles a request with express validation
  *
  * @export
  * @param {Request} req
