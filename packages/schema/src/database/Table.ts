@@ -101,6 +101,40 @@ export class Table extends Base {
     }
 
     /**
+     * Adds a combined unique constraint to this table.
+     *
+     * @param {string[]} columns
+     * @returns {this}
+     * @memberof Table
+     */
+    public uniqueConstraint(columns: string[]): this {
+        if (columns.length >= 2) {
+            const cols = this.columns.filter(item => {
+                return columns.indexOf(item.getName()) !== -1;
+            });
+            if (cols.length === columns.length) {
+                const unique = new Constraint(
+                    `unique_${cols
+                        .map(c => {
+                            return c.getName();
+                        })
+                        .join("_")}`,
+                    eDBConstraintType.unique
+                );
+                cols.forEach(c => {
+                    unique.addColumn(c);
+                });
+                this.constraints.push(unique);
+            } else {
+                throw new Error("Column names do not match existing columns!");
+            }
+        } else {
+            throw new Error("Unique Constraint needs at least to columns!");
+        }
+        return this;
+    }
+
+    /**
      * Adds a column to this table.
      *
      * @protected
