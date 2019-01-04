@@ -4,8 +4,6 @@
  * @interface <%=name%>
  * @export
  */
-export interface <%=name%> {
-<% columns.forEach(column => { %>
-	<%=column.getName()%>?: <%=mapType(column.getType())%><%=";" -%>
-<%});%>
+export interface <%=name%> {<% columns.forEach(column => { %>
+	<%=column.getName()%>?: <%=mapType(column.getType())%><%=";" %><%});%>
 }
