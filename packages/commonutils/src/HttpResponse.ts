@@ -1,5 +1,5 @@
-import { Response } from "express";
-import { Result } from "express-validator/check";
+import { Request, Response } from "express";
+import { Result, validationResult } from "express-validator/check";
 import { HttpStatus } from "./HttpStatus";
 import { wrapInArray } from "./Utils";
 
@@ -77,6 +77,34 @@ export class HttpResponse {
     public unAuthorized(error: any | any[]): Response {
         return this.error(HttpStatus.ClientErrors.Unauthorized, error);
     }
+}
+
+/**
+ * Handels a request with express validation
+ *
+ * @export
+ * @param {Request} req
+ * @param {Response} res
+ * @param {(req?: Request, res?: Response) => Promise<Response>} callback
+ * @returns {Promise<Response>}
+ */
+export function withValidation(
+    req: Request,
+    res: Response,
+    callback: (req?: Request, res?: Response) => Promise<Response>
+): Promise<Response> {
+    return new Promise((resolve, reject) => {
+        try {
+            const errors = validationResult(req);
+            if (errors.isEmpty()) {
+                resolve(callback(req, res));
+            } else {
+                resolve(response(res).validationError(errors));
+            }
+        } catch (err) {
+            reject(response(res).error(HttpStatus.ServerErrors.InternalServerError, err));
+        }
+    });
 }
 
 /**
