@@ -107,12 +107,10 @@ export class FactoryBuilder {
     protected outFolder: string;
 
     /**
-     * Class constructor
-     * @param {(Table | Table[])} table
+     * Creates an instance of FactoryBuilder.
      * @memberof FactoryBuilder
      */
-    public constructor(table: Table | Table[]) {
-        this.tables = utils.wrapInArray(table);
+    public constructor() {
         this.factoryClasses = ["DbTypes"];
         this.factoryMethods = [];
         this.importedDbTypes = [];
@@ -368,10 +366,10 @@ export class FactoryBuilder {
      * @param {string} outFolder
      * @memberof FactoryBuilder
      */
-    public generate(outFolder: string) {
+    public generate(tables: Table[], outFolder: string) {
         const me = this,
             result: string[] = [];
-
+        this.tables = utils.wrapInArray(tables);
         this.outFolder = outFolder;
         this.baseFolder = path.join(this.outFolder, "base");
         mkdirp.sync(this.baseFolder);
