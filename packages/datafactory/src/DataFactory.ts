@@ -3,9 +3,18 @@ import { Logger } from "winston";
 import { pg as yesql } from "yesql";
 import { SQLClause } from "./SQLClause";
 
+/**
+ * Internal PG Pool object
+ */
 const pool = new Pool();
+/**
+ * Internal Winston Logger Object
+ */
+let logger: Logger;
 
-export let DataFactoryLogger: Logger;
+export function setDataFactoryLogger(winstonLogger: Logger) {
+    logger = winstonLogger;
+}
 
 /**
  * Interface for describing a generated sql statement.
@@ -57,8 +66,8 @@ export abstract class DataFactory {
         return new Promise(async (resolve, reject) => {
             try {
                 const yq = yesql(stmt)(params);
-                if (DataFactoryLogger) {
-                    DataFactoryLogger.debug(yq);
+                if (logger !== null) {
+                    logger.debug(yq);
                 }
                 resolve(await pool.query(yq.text, yq.values || []));
             } catch (err) {
