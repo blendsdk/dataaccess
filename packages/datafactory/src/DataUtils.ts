@@ -1,7 +1,4 @@
-import { Pool, QueryResult } from "pg";
-import { pg as yesql } from "yesql";
 import { DataFactory } from "./DataFactory";
-import { logger } from "./logger";
 
 /**
  * This class provides common database utility methods.

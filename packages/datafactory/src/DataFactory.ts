@@ -1,9 +1,11 @@
 import { Pool, QueryResult } from "pg";
+import { Logger } from "winston";
 import { pg as yesql } from "yesql";
-import { logger } from "./logger";
 import { SQLClause } from "./SQLClause";
 
 const pool = new Pool();
+
+export let DataFactoryLogger: Logger;
 
 /**
  * Interface for describing a generated sql statement.
@@ -55,7 +57,9 @@ export abstract class DataFactory {
         return new Promise(async (resolve, reject) => {
             try {
                 const yq = yesql(stmt)(params);
-                logger.debug(yq);
+                if (DataFactoryLogger) {
+                    DataFactoryLogger.debug(yq);
+                }
                 resolve(await pool.query(yq.text, yq.values || []));
             } catch (err) {
                 reject(err);
