@@ -11,6 +11,7 @@ import { eQueryMethod, FactoryBuilder } from "../typescript/FactoryBuilder";
 export interface ICreateUsersAndRoles {
     sys_user: Table;
     sys_role: Table;
+    sys_profile: Table;
 }
 
 /**
@@ -24,7 +25,8 @@ export interface ICreateUsersAndRoles {
 export function createUsersAndRoles(db: Database, fb: FactoryBuilder): ICreateUsersAndRoles {
     const sys_user = db.addTable("sys_user"),
         sys_role = db.addTable("sys_role"),
-        sys_user_role = db.addTable("sys_user_role");
+        sys_user_role = db.addTable("sys_user_role"),
+        sys_profile = db.addTable("sys_profile");
 
     sys_user
         .primaryKeyColumn()
@@ -44,6 +46,13 @@ export function createUsersAndRoles(db: Database, fb: FactoryBuilder): ICreateUs
         .stringColumn("role", { unique: true })
         .stringColumn("description", { required: false });
 
+    sys_profile
+        .primaryKeyColumn()
+        .stringColumn("first_name")
+        .stringColumn("last_name")
+        .stringColumn("picture")
+        .referenceColumn("user_id", sys_user);
+
     fb.addMethod([
         {
             forTable: sys_user,
@@ -59,7 +68,7 @@ export function createUsersAndRoles(db: Database, fb: FactoryBuilder): ICreateUs
         },
         {
             forTable: sys_user,
-            methodName: "getUserRoles",
+            methodName: "getRoles",
             returnType: "ISysUserRole",
             returnTypeIsArray: true,
             description: "Given a user_id this method returns the user roles",
@@ -80,5 +89,5 @@ export function createUsersAndRoles(db: Database, fb: FactoryBuilder): ICreateUs
 					`
         }
     ]);
-    return { sys_user, sys_role };
+    return { sys_user, sys_role, sys_profile };
 }
