@@ -16,7 +16,8 @@
         "member-ordering": false,
         "object-literal-key-quotes": false,
         "no-console": false,
-        "max-line-length": false
+        "max-line-length": false,
+        "variable-name": false
     },
     "rulesDirectory": []
 }
