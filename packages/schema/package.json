@@ -1,6 +1,6 @@
 {
     "name": "@blendsdk/schema",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "description": "Generates PostgreSQL database schema based on a programmable object model.",
     "author": "Gevik Babakhani <gevik@blendjs.com>",
     "license": "MIT",
