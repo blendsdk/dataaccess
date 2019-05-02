@@ -108,19 +108,21 @@ export class HttpResponse {
  * @param {(req?: Request, res?: Response) => Promise<Response>} callback
  * @returns {Promise<Response>}
  */
-export function withValidation(
+export function withValidation(request: Request,
+	// tslint:disable-next-line:align
 	callback: (req?: Request, res?: Response) => Promise<Response>
 ): Promise<Response> {
+	const resp: Response = request.res;
 	return new Promise((resolve, reject) => {
 		try {
-			const errors = validationResult(this.request);
+			const errors = validationResult(request);
 			if (errors.isEmpty()) {
-				resolve(callback(this.request, this.response));
+				resolve(callback(request, resp));
 			} else {
-				resolve(response(this.response).validationError(errors));
+				resolve(response(resp).validationError(errors));
 			}
 		} catch (err) {
-			reject(response(this.response).error(HttpStatus.ServerErrors.InternalServerError, err));
+			reject(response(resp).error(HttpStatus.ServerErrors.InternalServerError, err));
 		}
 	});
 }
