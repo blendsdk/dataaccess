@@ -1,6 +1,6 @@
 {
     "name": "@blendsdk/commonutils",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "description": "Common utilities to use in Nodejs",
     "author": "Gevik Babakhani <gevik@blendjs.com>",
     "license": "MIT",
