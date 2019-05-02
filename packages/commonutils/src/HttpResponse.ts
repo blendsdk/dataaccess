@@ -17,16 +17,25 @@ export class HttpResponse {
      * @type {Response}
      * @memberof HttpResponse
      */
-    protected response: Response;
+	protected response: Response;
+	/**
+	 * Internal Request object
+	 *
+	 * @protected
+	 * @type {Request}
+	 * @memberof HttpResponse
+	 */
+	protected request: Request;
 
     /**
      * Creates an instance of HttpResponse.
      * @param {Response} response
      * @memberof HttpResponse
      */
-    public constructor(res: Response) {
-        this.response = res;
-    }
+	public constructor(res: Response) {
+		this.response = res;
+		this.request = res.req;
+	}
 
     /**
      * Provides an OK response.
@@ -37,9 +46,9 @@ export class HttpResponse {
      * @returns {Response}
      * @memberof HttpResponse
      */
-    public OK<T extends any>(res: Response, data: T): Response {
-        return res.status(HttpStatus.Success.OK).json(data);
-    }
+	public OK<T extends any>(data: T): Response {
+		return this.response.status(HttpStatus.Success.OK).json(data);
+	}
 
     /**
      * Creates a validation error response.
@@ -48,9 +57,9 @@ export class HttpResponse {
      * @returns
      * @memberof HttpResponse
      */
-    public validationError(errors: Result<any>) {
-        return this.error(HttpStatus.ClientErrors.BadRequest, errors.array());
-    }
+	public validationError(errors: Result<any>) {
+		return this.error(HttpStatus.ClientErrors.BadRequest, errors.array());
+	}
 
     /**
      * Provides an error response.
@@ -60,12 +69,23 @@ export class HttpResponse {
      * @returns {Response}
      * @memberof HttpResponse
      */
-    public error(code: number, error: any | any[]): Response {
-        return this.response.status(code).json({
-            error: true,
-            messages: wrapInArray(error)
-        });
-    }
+	public error(code: number, error: any | any[]): Response {
+		return this.response.status(code).json({
+			error: true,
+			messages: wrapInArray(error)
+		});
+	}
+
+	/**
+	 * Sends an InternalServerError (500) response
+	 *
+	 * @param {(any | any[])} error
+	 * @returns {Response}
+	 * @memberof HttpResponse
+	 */
+	public serverError(error: any | any[]): Response {
+		return this.error(HttpStatus.ServerErrors.InternalServerError, error);
+	}
 
     /**
      * Send an Unauthorized error response
@@ -74,9 +94,9 @@ export class HttpResponse {
      * @returns {Response}
      * @memberof HttpResponse
      */
-    public unAuthorized(error: any | any[]): Response {
-        return this.error(HttpStatus.ClientErrors.Unauthorized, error);
-    }
+	public unAuthorized(error: any | any[]): Response {
+		return this.error(HttpStatus.ClientErrors.Unauthorized, error);
+	}
 }
 
 /**
@@ -89,22 +109,20 @@ export class HttpResponse {
  * @returns {Promise<Response>}
  */
 export function withValidation(
-    req: Request,
-    res: Response,
-    callback: (req?: Request, res?: Response) => Promise<Response>
+	callback: (req?: Request, res?: Response) => Promise<Response>
 ): Promise<Response> {
-    return new Promise((resolve, reject) => {
-        try {
-            const errors = validationResult(req);
-            if (errors.isEmpty()) {
-                resolve(callback(req, res));
-            } else {
-                resolve(response(res).validationError(errors));
-            }
-        } catch (err) {
-            reject(response(res).error(HttpStatus.ServerErrors.InternalServerError, err));
-        }
-    });
+	return new Promise((resolve, reject) => {
+		try {
+			const errors = validationResult(this.request);
+			if (errors.isEmpty()) {
+				resolve(callback(this.request, this.response));
+			} else {
+				resolve(response(this.response).validationError(errors));
+			}
+		} catch (err) {
+			reject(response(this.response).error(HttpStatus.ServerErrors.InternalServerError, err));
+		}
+	});
 }
 
 /**
@@ -112,5 +130,5 @@ export function withValidation(
  * @param res
  */
 export const response = (res: Response): HttpResponse => {
-    return new HttpResponse(res);
+	return new HttpResponse(res);
 };
